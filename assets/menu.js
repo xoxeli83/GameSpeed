@@ -10,6 +10,7 @@
         <a href="/simon/">Simon</a>
         <a href="/palillos/">Palillos</a>
         <a href="/timbiriche/">Timbiriche</a>
+        <a href="https://www.google.com" target="_blank" rel="noopener" class="right">Pánico</a>
         <a href="/ranking/" class="right">Ranking</a>
       </nav>
     </header>
