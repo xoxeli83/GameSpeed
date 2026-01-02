@@ -1,16 +1,158 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Ahorcado - GameSpeed</title>
-  <link rel="stylesheet" href="./style.css" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ahorcado</title>
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-  <h1>Ahorcado</h1>
-  <p>Juego del ahorcado online.</p>
-  <p><a href="/">Volver</a></p>
+  <div class="wrap">
+    <div class="top">
+      <h1>Ahorcado Plus</h1>
+      <div class="row">
+        <span class="pill" id="modePill">Modo: —</span>
+        <span class="pill" id="catPill">Categoría: —</span>
+        <span class="pill" id="triesPill">Fallos: 0 / 7</span>
+        <button class="btn" id="settingsBtn">Ajustes</button>
+        <button class="btn" id="newBtn">Nueva ronda</button>
+      </div>
+    </div>
 
+    <div class="grid">
+      <!-- Juego -->
+      <div class="card playCard">
+        <div class="timerWrap">
+          <div><strong>Turno:</strong> <span id="turnView">—</span></div>
+          <div class="bar" aria-label="Tiempo"><div id="timeBar"></div></div>
+          <div><strong><span id="timeLeft">0</span>s</strong></div>
+        </div>
+
+        <div class="score" id="scoreArea">
+          <div class="scoreCard">
+            <div class="name">Jugador 1 <span class="turnBadge" id="p1Turn" style="display:none;">TU TURNO</span></div>
+            <div class="meta">Puntos: <strong id="p1Pts">0</strong> · Racha: <strong id="p1Streak">0</strong> · Aciertos: <strong id="p1Hits">0</strong> · Fallos: <strong id="p1Fails">0</strong></div>
+          </div>
+          <div class="scoreCard">
+            <div class="name">Jugador 2 <span class="turnBadge" id="p2Turn" style="display:none;">TU TURNO</span></div>
+            <div class="meta">Puntos: <strong id="p2Pts">0</strong> · Racha: <strong id="p2Streak">0</strong> · Aciertos: <strong id="p2Hits">0</strong> · Fallos: <strong id="p2Fails">0</strong></div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px; justify-content:space-between;">
+          <div class="row">
+            <button class="btn small warn" id="hintBtn">Pista (+1 fallo, -1 punto)</button>
+            <button class="btn small warn" id="wildBtn">Comodín (+2 fallos, -2 puntos)</button>
+            <button class="btn small bad" id="revealBtn">Rendirse</button>
+          </div>
+          <div class="row">
+            <button class="btn small" id="skipBtn">Pasar turno</button>
+          </div>
+        </div>
+
+        <div class="kbd" id="keyboard"></div>
+        <div class="msg" id="msg">Pulsa “Nueva ronda”. El tiempo empieza al poner la primera letra.</div>
+        <div class="msg" id="metaMsg">Anti-bloqueo: si no haces nada en <strong id="stallSec">—</strong>s, cuenta como fallo.</div>
+      </div>
+
+      <!-- Ahorcado fijo -->
+      <div class="card hangCard">
+        <p class="panelTitle">Ahorcado</p>
+        <div class="hangTop">
+          <div class="wrongBox">
+            <b>Falladas</b>
+            <div class="wrongLetters" id="wrongView">—</div>
+          </div>
+          <div class="word" id="wordView">—</div>
+        </div>
+
+        <div class="svgBox" id="svgBox">
+          <div class="flash" id="flash"></div>
+          <svg viewBox="0 0 220 260" aria-label="Dibujo del ahorcado">
+            <path d="M30 240 H190" stroke="rgba(232,238,252,.65)" stroke-width="6" fill="none" />
+            <path d="M65 240 V30" stroke="rgba(232,238,252,.65)" stroke-width="6" fill="none" />
+            <path d="M65 30 H145" stroke="rgba(232,238,252,.65)" stroke-width="6" fill="none" />
+            <path d="M145 30 V55" stroke="rgba(232,238,252,.65)" stroke-width="6" fill="none" />
+            <path d="M145 55 V70" stroke="rgba(255,209,102,.75)" stroke-width="4" fill="none" />
+            <g stroke="rgba(232,238,252,.85)" stroke-width="6" fill="none" stroke-linecap="round">
+              <circle id="p_head" cx="145" cy="92" r="22" style="opacity:0" />
+              <path id="p_body" d="M145 114 V165" style="opacity:0" />
+              <path id="p_larm" d="M145 130 L118 150" style="opacity:0" />
+              <path id="p_rarm" d="M145 130 L172 150" style="opacity:0" />
+              <path id="p_lleg" d="M145 165 L123 200" style="opacity:0" />
+              <path id="p_rleg" d="M145 165 L167 200" style="opacity:0" />
+              <g id="p_eyes" style="opacity:0" stroke-width="4">
+                <path d="M136 85 L142 91" />
+                <path d="M142 85 L136 91" />
+                <path d="M148 85 L154 91" />
+                <path d="M154 85 L148 91" />
+              </g>
+            </g>
+          </svg>
+        </div>
+        <div class="msg" id="resultMsg">—</div>
+        <div class="hint">Tildes: escribe A y se revelará Á. (Ñ es distinta)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal ajustes -->
+  <div class="overlay" id="overlay">
+    <div class="modal">
+      <div class="row" style="justify-content:space-between;">
+        <h2>Ajustes</h2>
+        <button class="btn small" id="closeSettingsBtn">Cerrar</button>
+      </div>
+
+      <div class="field">
+        <div>
+          <div style="font-weight:900;">Modo</div>
+          <div class="hint">Aplica al pulsar “Nueva ronda”.</div>
+        </div>
+        <select id="modeSel">
+          <option value="solo" selected>1 jugador</option>
+          <option value="versus">2 jugadores (misma palabra)</option>
+          <option value="duelo">Duelo (1 palabra por jugador)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div>
+          <div style="font-weight:900;">Dificultad</div>
+          <div class="hint">Cambia fallos, tiempos y anti-bloqueo.</div>
+        </div>
+        <select id="diffSel">
+          <option value="easy">Fácil</option>
+          <option value="normal" selected>Normal</option>
+          <option value="hard">Difícil</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <div>
+          <div style="font-weight:900;">Pistas / info</div>
+        </div>
+        <div class="row">
+          <label class="hint"><input type="checkbox" id="categoryHintChk" checked> Mostrar categoría</label>
+          <label class="hint"><input type="checkbox" id="dailyChk"> Palabra del día</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <div>
+          <div style="font-weight:900;">Audio</div>
+          <div class="hint">En móvil, pulsa ▶︎ una vez para habilitar sonido.</div>
+        </div>
+        <div class="row">
+          <label class="hint"><input type="checkbox" id="sfxChk" checked> SFX</label>
+          <label class="hint"><input type="checkbox" id="musicChk"> Música</label>
+          <button class="btn small ghost" id="audioBtn" title="Necesita un clic para habilitar audio">▶︎</button>
+        </div>
+      </div>
+
+      <div class="hint">Tip: en “misma palabra”, cada intento cambia de turno; el tiempo empieza al poner la primera letra del turno.</div>
+    </div>
+  </div>
   <script src="./game.js"></script>
 </body>
 </html>
