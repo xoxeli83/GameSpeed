@@ -1,0 +1,2 @@
+# GameSpeed
+Juegos rápidos
