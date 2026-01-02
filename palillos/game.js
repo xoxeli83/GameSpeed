@@ -1,1 +1,2 @@
+console.log("Palillos cargado");
 
