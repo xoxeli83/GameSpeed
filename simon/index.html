@@ -2,15 +2,51 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
   <title>Simon - GameSpeed</title>
-  <link rel="stylesheet" href="./style.css" />
-</head>
-<body>
-  <h1>Simon</h1>
-  <p>Juego Simon con sonidos.</p>
-  <p><a href="/">Volver</a></p>
 
+  <!-- CSS del juego -->
+  <link rel="stylesheet" href="./style.css" />
+  <!-- CSS del menú -->
+  <link rel="stylesheet" href="/assets/menu.css" />
+</head>
+
+<body>
+
+  <!-- MENÚ GLOBAL -->
+  <div id="menu"></div>
+
+  <!-- JUEGO -->
+  <section id="screenHome" class="screen active">
+    <div class="top">
+      <div>
+        <h1>Simon</h1>
+        <p class="muted">Memoriza la secuencia de iconos y sonidos.</p>
+      </div>
+      <button class="btn ghost" id="homeFsBtn">Pantalla completa</button>
+    </div>
+
+    <div class="panel">
+      <div class="kpi">
+        <div class="pill">Modo: <strong id="modeHome">Normal</strong></div>
+        <div class="pill">BPM: <strong id="bpmHome">120</strong></div>
+        <div class="pill">Récord: <strong id="bestHome">0</strong></div>
+      </div>
+      <p class="msg" id="homeMsg">Pulsa “Inicio” para jugar.</p>
+    </div>
+
+    <div class="row">
+      <button class="btn secondary" id="goSettingsBtn">Ajustes</button>
+      <button class="btn primary" id="goGameBtn">Inicio</button>
+    </div>
+  </section>
+
+  <section id="screenSettings" class="screen"></section>
+  <section id="screenGame" class="screen"></section>
+
+  <!-- JS del juego -->
   <script src="./game.js"></script>
+  <!-- JS del menú -->
+  <script src="/assets/menu.js" defer></script>
 </body>
 </html>
