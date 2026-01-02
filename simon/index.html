@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Simon - GameSpeed</title>
+  <title>Simon</title>
 
   <!-- CSS del juego -->
   <link rel="stylesheet" href="./style.css" />
@@ -12,38 +12,144 @@
 </head>
 
 <body>
-
   <!-- MENÚ GLOBAL -->
   <div id="menu"></div>
 
   <!-- JUEGO -->
   <section id="screenHome" class="screen active">
-    <div class="top">
-      <div>
-        <h1>Simon</h1>
-        <p class="muted">Memoriza la secuencia de iconos y sonidos.</p>
+  <div class="top">
+    <div>
+      <h1>Juego Música + Iconos</h1>
+      <p class="muted">Secuencia más lenta al inicio. “Dios” es el modo ultra-rápido.</p>
+    </div>
+    <button class="btn ghost" id="homeFsBtn">Pantalla completa</button>
+  </div>
+
+  <div class="panel">
+    <div class="kpi">
+      <div class="pill">Modo: <strong id="modeHome">Normal</strong></div>
+      <div class="pill">BPM: <strong id="bpmHome">120</strong></div>
+      <div class="pill">Récord: <strong id="bestHome">0</strong></div>
+    </div>
+    <p class="msg" id="homeMsg">Pulsa “Inicio” para jugar.</p>
+  </div>
+
+  <div class="row">
+    <button class="btn secondary" id="goSettingsBtn">Ajustes</button>
+    <button class="btn primary" id="goGameBtn">Inicio</button>
+  </div>
+</section>
+
+<section id="screenSettings" class="screen">
+  <div class="top">
+    <div>
+      <h1>Ajustes</h1>
+      <p class="muted">Fácil/Normal/Difícil/Experto/Dios o Personalizado.</p>
+    </div>
+    <button class="btn ghost" id="backHomeBtn">Volver</button>
+  </div>
+
+  <div class="settings">
+    <div class="set">
+      <div class="title">Modo</div>
+      <label>Selecciona modo <span class="val" id="modeVal">Normal</span></label>
+      <select id="modeSel">
+        <option value="easy">Fácil</option>
+        <option value="normal" selected>Medio (Normal)</option>
+        <option value="hard">Difícil</option>
+        <option value="expert">Experto</option>
+        <option value="god">Dios</option>
+        <option value="custom">Personalizado</option>
+      </select>
+      <div class="msg" style="color:var(--muted);text-align:left;margin-top:8px" id="modeDesc"></div>
+    </div>
+
+    <div class="set" id="customBox" style="display:none">
+      <div class="title">Personalizado</div>
+
+      <label>Tiempo ENTRE pulsaciones (ms) <span class="val" id="respVal">3000</span></label>
+      <input id="respRange" type="range" min="1000" max="8000" value="3000" />
+
+      <label>Tiempo de mostrar secuencia (ms por icono) <span class="val" id="showVal">650</span></label>
+      <input id="showRange" type="range" min="250" max="1200" value="650" />
+
+      <label>Vidas <span class="val" id="livesVal">3</span></label>
+      <input id="livesRange" type="range" min="1" max="7" value="3" />
+
+      <label>Puntos iniciales <span class="val" id="startScoreVal">60</span></label>
+      <input id="startScoreRange" type="range" min="0" max="250" value="60" />
+
+      <label>Penalización base (puntos) <span class="val" id="penVal">12</span></label>
+      <input id="penRange" type="range" min="1" max="80" value="12" />
+
+      <label>Aceleración de secuencia por nivel (%) <span class="val" id="speedVal">2%</span></label>
+      <input id="speedRange" type="range" min="0" max="12" value="2" />
+
+      <div class="toggles">
+        <button class="btn small secondary" id="strictBtn">STRICT: OFF</button>
+        <button class="btn small secondary" id="vibeBtn">VIBRA: ON</button>
       </div>
-      <button class="btn ghost" id="homeFsBtn">Pantalla completa</button>
     </div>
 
-    <div class="panel">
-      <div class="kpi">
-        <div class="pill">Modo: <strong id="modeHome">Normal</strong></div>
-        <div class="pill">BPM: <strong id="bpmHome">120</strong></div>
-        <div class="pill">Récord: <strong id="bestHome">0</strong></div>
+    <div class="set" id="audioBox" style="display:none">
+      <div class="title">Audio</div>
+      <label>Estilo musical</label>
+      <select id="styleSel">
+        <option value="arcade">Arcade</option>
+        <option value="techno">Techno</option>
+        <option value="rock">Rock</option>
+        <option value="countdown">Countdown</option>
+        <option value="cyber">Cyber</option>
+      </select>
+
+      <div class="row" style="justify-content:flex-start;margin-top:8px">
+        <button class="btn small secondary" id="musicBtn">MÚSICA: OFF</button>
+        <button class="btn small secondary" id="tapBtn">TAP BPM</button>
       </div>
-      <p class="msg" id="homeMsg">Pulsa “Inicio” para jugar.</p>
+
+      <label>BPM <span class="val" id="bpmVal">120</span></label>
+      <input id="bpmRange" type="range" min="80" max="180" value="120" />
+
+      <label>Volumen música <span class="val" id="volVal">100%</span></label>
+      <input id="volRange" type="range" min="10" max="100" value="100" />
+
+      <label>Volumen SFX <span class="val" id="sfxVal">100%</span></label>
+      <input id="sfxRange" type="range" min="10" max="100" value="100" />
+      <div class="msg" style="color:var(--muted);text-align:left;margin-top:8px">Volumen del juego alto por defecto; ajusta el volumen final con el móvil/PC.</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <button class="btn secondary" id="applyBtn">Aplicar</button>
+    <button class="btn primary" id="playFromSettingsBtn">Jugar</button>
+  </div>
+</section>
+
+<section id="screenGame" class="screen">
+  <div class="gameHud">
+    <div class="hudTop">
+      <div style="font-weight:1100">Jugando</div>
+      <div class="hudBtns">
+        <button class="btn small secondary" id="repeatBtn">Repeat</button>
+        <button class="btn small danger" id="exitBtn">Salir</button>
+      </div>
     </div>
 
-    <div class="row">
-      <button class="btn secondary" id="goSettingsBtn">Ajustes</button>
-      <button class="btn primary" id="goGameBtn">Inicio</button>
+    <div class="kpi">
+      <div class="pill">Nivel: <strong id="levelTxt">0</strong></div>
+      <div class="pill">Vidas: <strong id="livesTxt">0</strong></div>
+      <div class="pill">Puntos: <strong id="scoreTxt">0</strong></div>
+      <div class="pill">Tiempo: <strong id="timeTxt">0.0s</strong></div>
+      <div class="pill">Resp.: <strong id="respTxt">3.0s</strong></div>
+      <div class="pill">Progreso: <strong id="progressTxt">-</strong></div>
     </div>
-  </section>
 
-  <section id="screenSettings" class="screen"></section>
-  <section id="screenGame" class="screen"></section>
+    <div class="progressBar"><div class="progressFill" id="respFill"></div></div>
+    <div class="msg" id="gameMsg">Escucha la secuencia…</div>
+  </div>
 
+  <div id="board" aria-label="Botones"></div>
+</section>
   <!-- JS del juego -->
   <script src="./game.js"></script>
   <!-- JS del menú -->
