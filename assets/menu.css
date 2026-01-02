@@ -1,0 +1,26 @@
+.main-menu{
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: #0b1220;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.main-menu nav{
+  max-width:1100px;
+  margin:0 auto;
+  padding:10px 18px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+
+.main-menu a{
+  color: #e8eefc;
+  text-decoration: none;
+  font-weight: 600;
+  opacity: .85;
+}
+
+.main-menu a:hover{ opacity: 1; }
+.main-menu .right{ margin-left:auto; }
