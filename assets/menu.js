@@ -1,9 +1,9 @@
 (function () {
-  const el = document.getElementById("menu");
-  if (!el) return;
+  const host = document.getElementById("menu");
+  if (!host) return;
 
-  el.innerHTML = `
-    <header class="main-menu">
+  host.innerHTML = `
+    <header class="main-menu" id="mainMenu">
       <nav>
         <a href="/">GameSpeed</a>
         <a href="/ahorcado/">Ahorcado</a>
@@ -14,4 +14,15 @@
       </nav>
     </header>
   `;
+
+  function applyMenuHeight() {
+    const menu = document.getElementById("mainMenu");
+    if (!menu) return;
+    const h = Math.ceil(menu.getBoundingClientRect().height);
+    document.documentElement.style.setProperty("--menu-h", h + "px");
+  }
+
+  // Espera a que el DOM pinte y calcule bien alturas
+  requestAnimationFrame(applyMenuHeight);
+  window.addEventListener("resize", applyMenuHeight);
 })();
