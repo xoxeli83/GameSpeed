@@ -1,7 +1,13 @@
+:root{
+  --menu-h: 52px; /* fallback */
+}
+
 .main-menu{
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 1000;
+  left: 0;
+  right: 0;
+  z-index: 99999;
   background: #0b1220;
   border-bottom: 1px solid rgba(255,255,255,.08);
 }
@@ -21,6 +27,15 @@
   font-weight: 600;
   opacity: .85;
 }
-
 .main-menu a:hover{ opacity: 1; }
 .main-menu .right{ margin-left:auto; }
+
+/* Empuja toda la página hacia abajo para que el menú no tape nada */
+body{
+  padding-top: var(--menu-h);
+}
+
+/* Caso Simon: sus pantallas van fixed/inset:0 y usan padding propio. Lo corregimos */
+.screen{
+  padding-top: calc(var(--menu-h) + max(14px, env(safe-area-inset-top))) !important;
+}
