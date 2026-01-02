@@ -1,17 +1,234 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Palillos - GameSpeed</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Palillos</title>
+  <!-- CSS del juego -->
   <link rel="stylesheet" href="./style.css" />
+  <!-- CSS del menú -->
+  <link rel="stylesheet" href="/assets/menu.css" />
 </head>
 <body>
-  <h1>Palillos</h1>
-  <p>Juego de palillos online.</p>
-  <p><a href="/">Volver</a></p>
+<!-- MENÚ GLOBAL -->
+<div id="menu"></div>
+<div class="bg-anim" id="bgAnim"></div>
+<canvas id="fxCanvas"></canvas>
 
+<div class="wrap">
+  <section class="card main">
+    <h1>Palillos ULTRA v13</h1>
+    <p class="sub">Arrastra/toca palillos contiguos (una fila por turno). Pierde quien quita el último.</p>
+
+    <div class="status" aria-label="Marcadores">
+      <div class="badge"><span class="k">Marcador:</span> <span id="scoreText">0 - 0</span></div>
+      <div class="badge"><span class="k">Tiempo:</span> <span id="timerText">—</span></div>
+      <div class="badge"><span class="k">Serie:</span> <span id="seriesText">Bo3</span></div>
+    </div>
+
+    <div class="turnBanner" id="turnBanner">
+      <div class="left">
+        <div class="t" id="turnTitle">Pulsa Iniciar</div>
+        <div class="s" id="turnSub">Ajusta opciones con “Ajustes”.</div>
+      </div>
+      <div class="lock" id="turnLock">🔒</div>
+    </div>
+
+    <div class="board" id="board" aria-label="Tablero de palillos">
+      <div class="row" data-row="0" id="row0"><div class="selectGlow"></div></div>
+      <div class="row" data-row="1" id="row1"><div class="selectGlow"></div></div>
+      <div class="row" data-row="2" id="row2"><div class="selectGlow"></div></div>
+    </div>
+
+    <div class="controls">
+      <button id="btnStart" class="iconBtn " aria-label="Iniciar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="8 5 19 12 8 19 8 5"/></svg><span class="sr-only">Iniciar</span></button>
+      <button id="btnFinish" disabled class="iconBtn " aria-label="Finalizar turno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10H7z"/><path d="M4 4h4"/><path d="M16 4h4"/><path d="M4 20h4"/><path d="M16 20h4"/></svg><span class="sr-only">Finalizar turno</span></button>
+      <button id="btnUndo" class="secondary iconBtn ".strip() disabled aria-label="Deshacer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 1 1 0 10h-4"/></svg><span class="sr-only">Deshacer</span></button>
+      <button id="btnNew" class="danger iconBtn ".strip() disabled aria-label="Nueva ronda"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v7h-7"/></svg><span class="sr-only">Nueva ronda</span></button>
+      <button id="btnSettings" class="secondary iconBtn ".strip() aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7z"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .3 1.7 1.7 0 0 0-.8 1.46V21a2 2 0 1 1-4 0v-.08A1.7 1.7 0 0 0 8.4 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06A2 2 0 1 1 3.64 17l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.3-1 1.7 1.7 0 0 0-1.46-.8H3a2 2 0 1 1 0-4h.08A1.7 1.7 0 0 0 4.6 8.4a1.7 1.7 0 0 0-.34-1.87L4.2 6.47A2 2 0 1 1 7.03 3.64l.06.06A1.7 1.7 0 0 0 9 4.6c.3 0 .69-.11 1-.3a1.7 1.7 0 0 0 .8-1.46V3a2 2 0 1 1 4 0v.08c0 .6.3 1.16.8 1.46.31.19.7.3 1 .3a1.7 1.7 0 0 0 1.87-.34l.06-.06A2 2 0 1 1 20.36 7l-.06.06A1.7 1.7 0 0 0 19.4 9c0 .3.11.69.3 1 .19.31.3.7.3 1s-.11.69-.3 1z"/></svg><span class="sr-only">Ajustes</span></button>
+    </div>
+
+    <div class="help">Blitz: si se acaba el tiempo, penalización automática (1 palillo). Deshacer: limitado por ronda.</div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div id="settingsBackdrop" aria-hidden="true"></div>
+<div id="settingsModal" class="card">
+  <div class="settings-head">
+    <h2>Ajustes</h2>
+    <button class="btnClose" id="btnCloseSettings" aria-label="Cerrar ajustes">×</button>
+  </div>
+
+  <div class="kv">
+    <label>Modo</label>
+    <select id="modeSelect">
+      <option value="local">Local</option>
+      <option value="cpu" selected>Contra CPU</option>
+    </select>
+
+    <label>Jugadores (local)</label>
+    <select id="playersSelect">
+      <option value="2" selected>2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+    </select>
+
+    <label>CPU (nivel)</label>
+    <select id="cpuSelect">
+      <option value="random" selected>1 — Aleatoria</option>
+      <option value="easy">2 — Fácil</option>
+      <option value="medium">3 — Media</option>
+      <option value="hard">4 — Difícil</option>
+      <option value="expert">5 — Experta</option>
+      <option value="optimal">6 — Imposible</option>
+    </select>
+
+    <label>CPU (personalidad)</label>
+    <select id="cpuPersona">
+      <option value="balanced" selected>Equilibrada</option>
+      <option value="conservative">Conservadora</option>
+      <option value="aggressive">Agresiva</option>
+      <option value="troll">Tramposa</option>
+    </select>
+
+    <label>Modo aprendizaje (CPU explica)</label>
+    <select id="learnSelect">
+      <option value="0">Off</option>
+      <option value="1" selected>On</option>
+    </select>
+
+    <label>Inicio</label>
+    <select id="startSelect">
+      <option value="1">Jugador 1</option>
+      <option value="2">Jugador 2</option>
+      <option value="rand" selected>Aleatorio</option>
+    </select>
+
+    <label>Serie</label>
+    <select id="seriesSelect">
+      <option value="1" selected>Única</option>
+      <option value="3">Mejor de 3</option>
+      <option value="5">Mejor de 5</option>
+    </select>
+
+    <label>Blitz (seg/turno)</label>
+    <select id="blitzSelect">
+      <option value="0">Off</option>
+      <option value="10" selected>10s</option>
+      <option value="15">15s</option>
+      <option value="20">20s</option>
+      <option value="30">30s</option>
+    </select>
+
+    <label>Obstáculos</label>
+    <select id="obstaclesSelect">
+      <option value="0" selected>Off</option>
+      <option value="1">Suave (1/row)</option>
+      <option value="2">Medio (2/row)</option>
+    </select>
+
+    <label>Deshacer por ronda</label>
+    <select id="undoLimit">
+      <option value="0">0</option>
+      <option value="1" selected>1</option>
+      <option value="2">2</option>
+    </select>
+
+    <label>Máximo palillos/turno</label>
+    <select id="maxRemove">
+      <option value="0" selected>Sin límite</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+    </select>
+
+    <label>Filas (arriba/medio/abajo)</label>
+    <div class="rowInputs">
+      <input id="rowA" type="number" min="1" max="15" value="7" />
+      <input id="rowB" type="number" min="1" max="15" value="5" />
+      <input id="rowC" type="number" min="1" max="15" value="3" />
+    </div>
+
+    <label>Modo aula</label>
+    <select id="focusSelect">
+      <option value="0" selected>Off</option>
+      <option value="1">On</option>
+    </select>
+
+    <label>Modo profesor (bloquea 7/5/3)</label>
+    <select id="profSelect">
+      <option value="0" selected>Off</option>
+      <option value="1">On</option>
+    </select>
+
+    <label>Reto</label>
+    <select id="challengeSelect">
+      <option value="none" selected>Ninguno</option>
+      <option value="max2">Reto: máximo 2/turno</option>
+      <option value="blitz10">Reto: blitz 10s</option>
+      <option value="noundo">Reto: sin deshacer</option>
+    </select>
+
+    <label>Guardar automáticamente</label>
+    <select id="saveSelect">
+      <option value="0">Off</option>
+      <option value="1" selected>On</option>
+    </select>
+
+    <label>Skin</label>
+    <select id="skinSelect">
+      <option value="ultra" selected>Ultra</option>
+      <option value="neon">Neón</option>
+      <option value="wood">Madera</option>
+      <option value="minimal">Minimal</option>
+    </select>
+
+    <label>Alto contraste</label>
+    <select id="contrastSelect">
+      <option value="0" selected>Off</option>
+      <option value="1">On</option>
+    </select>
+  </div>
+
+  <div class="hr"></div>
+  <div class="small" id="statsLine">Stats: —</div>
+
+  <div class="controls" style="margin-top:12px;">
+    <button id="btnApplySettings">Aplicar</button>
+    <button id="btnClearSave" class="secondary">Borrar guardado</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" aria-hidden="true">
+  <div class="panel">
+    <button class="xclose" id="btnCloseOverlay" aria-label="Cerrar">×</button>
+    <div class="big" id="ovBig">¡RONDA!</div>
+    <h2 id="ovTitle">Gana Jugador 1</h2>
+    <p id="ovSub">—</p>
+    <div class="btns">
+      <button id="btnNext">Siguiente</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="resumeOverlay" aria-hidden="true">
+  <div class="panel">
+    <button class="xclose" id="btnCloseResume" aria-label="Cerrar">×</button>
+    <div class="big" style="color:var(--warn);">¿Continuar?</div>
+    <h2>Partida guardada encontrada</h2>
+    <p>Puedes continuar exactamente donde lo dejaste.</p>
+    <div class="btns">
+      <button id="btnResume">Continuar</button>
+      <button class="secondary" id="btnDiscard">Empezar de cero</button>
+    </div>
+  </div>
+</div>
+
+      <!-- JS del juego -->
   <script src="./game.js"></script>
+  <!-- JS del menú -->
+  <script src="/assets/menu.js" defer></script>
 </body>
 </html>
-
