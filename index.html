@@ -4,15 +4,126 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GameSpeed - Juegos rápidos</title>
+
+  <link rel="stylesheet" href="/assets/menu.css">
+  <link rel="stylesheet" href="/assets/home.css">
 </head>
+
 <body>
-  <h1>GameSpeed</h1>
-  <p>Juegos rápidos online sin registro.</p>
-  <ul>
-    <li><a href="/ahorcado/">Ahorcado</a></li>
-    <li><a href="/simon/">Simon</a></li>
-    <li><a href="/palillos/">Palillos</a></li>
-    <li><a href="/timbiriche/">Timbiriche</a></li>
-  </ul>
+  <div id="menu"></div>
+
+  <main class="home">
+    <header class="home-head">
+      <div>
+        <h1>GameSpeed</h1>
+        <p>Juegos rápidos online.</p>
+      </div>
+
+      <div class="home-actions">
+        <a class="btn" href="/ranking/">Ranking</a>
+        <button class="btn" id="btnSettings">Ajustes</button>
+        <a class="btn danger" id="btnExitFast" href="https://www.google.com" target="_blank" rel="noopener">Salir rápido</a>
+      </div>
+    </header>
+
+    <section class="grid">
+      <a class="card" href="/ahorcado/">
+        <div class="icon">🪢</div>
+        <div class="title">Ahorcado</div>
+        <div class="desc">Adivina la palabra.</div>
+      </a>
+
+      <a class="card" href="/simon/">
+        <div class="icon">🎵</div>
+        <div class="title">Simon</div>
+        <div class="desc">Memoria + sonidos.</div>
+      </a>
+
+      <a class="card" href="/palillos/">
+        <div class="icon">🟧</div>
+        <div class="title">Palillos</div>
+        <div class="desc">Estrategia rápida.</div>
+      </a>
+
+      <a class="card" href="/timbiriche/">
+        <div class="icon">🔲</div>
+        <div class="title">Timbiriche</div>
+        <div class="desc">Cuadros y líneas.</div>
+      </a>
+    </section>
+  </main>
+
+  <!-- Modal Ajustes -->
+  <div class="modal" id="settingsModal" aria-hidden="true">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h2>Ajustes</h2>
+        <button class="btn" id="btnCloseSettings">Cerrar</button>
+      </div>
+
+      <div class="settings">
+        <label class="toggle">
+          <input type="checkbox" id="toggleSound">
+          <span>Sonido (global)</span>
+        </label>
+
+        <label class="toggle">
+          <input type="checkbox" id="toggleDark">
+          <span>Modo oscuro</span>
+        </label>
+      </div>
+
+      <p class="note">
+        Estos ajustes se guardan en tu navegador.
+      </p>
+    </div>
+  </div>
+
+  <script src="/assets/menu.js" defer></script>
+  <script>
+    // Ajustes globales (localStorage)
+    const modal = document.getElementById('settingsModal');
+    const btnSettings = document.getElementById('btnSettings');
+    const btnClose = document.getElementById('btnCloseSettings');
+    const tSound = document.getElementById('toggleSound');
+    const tDark = document.getElementById('toggleDark');
+
+    const KEY_SOUND = 'gs_sound';
+    const KEY_DARK  = 'gs_dark';
+
+    function applyPrefs(){
+      const sound = localStorage.getItem(KEY_SOUND);
+      const dark  = localStorage.getItem(KEY_DARK);
+
+      tSound.checked = (sound !== 'off'); // por defecto ON
+      tDark.checked  = (dark === 'on');
+
+      document.documentElement.classList.toggle('dark', tDark.checked);
+    }
+
+    function openModal(){
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+    }
+    function closeModal(){
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    btnSettings.addEventListener('click', openModal);
+    btnClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e)=>{ if(e.target === modal) closeModal(); });
+
+    tSound.addEventListener('change', ()=>{
+      localStorage.setItem(KEY_SOUND, tSound.checked ? 'on' : 'off');
+    });
+
+    tDark.addEventListener('change', ()=>{
+      localStorage.setItem(KEY_DARK, tDark.checked ? 'on' : 'off');
+      applyPrefs();
+    });
+
+    applyPrefs();
+  </script>
 </body>
 </html>
