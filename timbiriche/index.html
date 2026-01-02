@@ -1,16 +1,318 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Timbiriche - GameSpeed</title>
-  <link rel="stylesheet" href="./style.css" />
-</head>
-<body>
-  <h1>Timbiriche</h1>
-  <p>Juego de timbiriche online.</p>
-  <p><a href="/">Volver</a></p>
+  <meta charset="utf-8" />
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Fondo -->
+  <rect width="512" height="512" rx="96" fill="%230b1020"/>
 
+  <!-- Cuadrado de líneas (jugadores) -->
+  <line x1="150" y1="150" x2="362" y2="150" stroke="%231e88e5" stroke-width="26" stroke-linecap="round"/>
+  <line x1="362" y1="150" x2="362" y2="362" stroke="%23e91e63" stroke-width="26" stroke-linecap="round"/>
+  <line x1="362" y1="362" x2="150" y2="362" stroke="%23f97316" stroke-width="26" stroke-linecap="round"/>
+  <line x1="150" y1="362" x2="150" y2="150" stroke="%2322c55e" stroke-width="26" stroke-linecap="round"/>
+
+  <!-- Puntos -->
+  <circle cx="150" cy="150" r="22" fill="white"/>
+  <circle cx="362" cy="150" r="22" fill="white"/>
+  <circle cx="362" cy="362" r="22" fill="white"/>
+  <circle cx="150" cy="362" r="22" fill="white"/>
+
+  <!-- Texto TiRiBiCHe -->
+  <!-- Consonantes -->
+  <text x="256" y="290" text-anchor="middle"
+        font-size="96"
+        font-family="system-ui,Segoe UI,Roboto,Arial"
+        font-weight="900"
+        fill="white"
+        letter-spacing="2">
+    T<tspan fill="%23ffd54a" font-size="80">i</tspan>
+    R<tspan fill="%2322c55e" font-size="80">i</tspan>
+    B<tspan fill="%231e88e5" font-size="80">i</tspan>
+    C<tspan fill="%23e91e63" font-size="80">h</tspan>
+    <tspan fill="%23f97316" font-size="80">e</tspan>
+  </text>
+</svg>'>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Timbiriche</title>
+  <!-- CSS del juego -->
+  <link rel="stylesheet" href="./style.css" />
+  <!-- CSS del menú -->
+  <link rel="stylesheet" href="/assets/menu.css" />
+</head>
+
+<body class="theme-arcade">
+    <!-- MENÚ GLOBAL -->
+  <div id="menu"></div>
+  <div class="wrap">
+    <div class="bar">
+      <div class="left">
+        <div class="playersGrid" id="playersGrid"></div>
+
+        <div class="card" id="turnCard" style="align-items:flex-start;">
+          <div>
+            <div class="label">Turno</div>
+            <div class="value" id="turnText">Sin iniciar</div>
+            <div class="hint" id="progressText" style="margin-top:6px">Shot-clock: 15s (no iniciado)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="card">
+          <div class="label">Modo</div>
+          <select id="modeSel">
+            <option value="pvp" selected>PvP</option>
+            <option value="cpu">Vs CPU</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="label">Jugadores</div>
+          <select id="playersSel">
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+          </select>
+        </div>
+        <div class="card" id="turnModeCard" style="display:none;">
+          <div class="label">Turnos</div>
+          <select id="turnModeSel">
+            <option value="order" selected>En orden</option>
+            <option value="random">Aleatorio</option>
+          </select>
+          <div class="hint" style="margin-top:6px; max-width:180px">
+            Aleatorio (4 jugadores): no repite turno y nadie se queda &gt;5 turnos sin jugar.
+          </div>
+        </div>
+
+        <div class="card" id="cpuLvlCard" style="display:none;">
+          <div class="label">Nivel CPU</div>
+          <select id="cpuLevel"></select>
+        </div>
+
+        <div class="card">
+          <div class="label">Tema</div>
+          <select id="themeSel">
+            <option value="light">Claro</option>
+            <option value="arcade" selected>Arcade (oscuro)</option>
+            <option value="paper">Papel</option>
+          </select>
+        </div>
+
+        <div class="card">
+          <div class="label">Tablero</div>
+          <button id="boardBtn" class="btnPrimary" style="padding:10px 14px">20×20</button>
+          <input id="cols" class="num" type="number" min="6" max="30" value="20" style="display:none" />
+          <input id="rows" class="num" type="number" min="6" max="30" value="20" style="display:none" />
+        </div>
+
+        <div class="card">
+          <div class="label">Tiempo total (min)</div>
+          <select id="clock">
+            <option value="3">3</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="25">25</option>
+            <option value="30">30</option>
+          </select>
+        </div>
+
+        <button id="startBtn" class="btnPrimary" disabled>Empezar</button>
+        <button id="pauseBtn" disabled>Pausa</button>
+      </div>
+    </div>
+
+    
+    <div class="playActions" id="playActions">
+      <div class="pillTiny" id="musicPill">🎵 <span id="musicName">—</span></div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <button id="pauseBtn2" class="btnPrimary">Pausa</button>
+        <button id="settingsBtn2" title="Mostrar/ocultar ajustes">⚙️</button>
+      </div>
+    </div>
+
+    <div class="playHud" id="playHud"></div>
+
+    <div class="board" id="boardWrap">
+      <div class="boardTop">
+        <div class="hint" id="msg">Escribe nombres, elige emojis, pulsa <b>Crear</b> y luego <b>Iniciar</b>.</div>
+
+        <div class="boardBtns">
+        <button id="soundPanelBtn" title="Abrir panel de sonidos/emoji">Sonidos</button>
+        <span class="pill" id="musicNowPill" title="Música de fondo actual" style="font-weight:950">
+          🎵 <span id="musicNow">—</span>
+        </span>
+
+          <button id="createBtn" class="btnPrimary" disabled>Crear</button>
+
+          <div class="quickBtns">
+            <span class="tag">Rápido</span>
+            <button id="q25Btn" title="Pone ~25% de líneas neutrales sin dejar cuadrados a 1 toque">25%</button>
+            <button id="q50Btn" title="Pone ~50% de líneas neutrales sin dejar cuadrados a 1 toque">50%</button>
+            <button id="q75Btn" title="Pone ~75% de líneas neutrales sin dejar cuadrados a 1 toque">75%</button>
+          </div>
+
+          <div class="shotBadgeBig" id="shotBadgeBig" style="display:none;">
+            <span class="shotDot" id="shotDot"></span>
+            <span class="tag" id="shotTag">15s</span>
+            <span class="sec" id="shotClock">15</span>
+          </div>
+
+          <!-- por defecto OFF -->
+          <label class="toggle" id="safeTapToggle" title="Con toque seguro, para poner una línea hay que tocar 2 veces la misma.">
+            <input id="safeTap" type="checkbox" />
+            Toque seguro
+          </label>
+
+          <!-- por defecto OFF -->
+          <label class="toggle" id="loupeToggle" title="Lupa (si está activa).">
+            <input id="loupeOn" type="checkbox" />
+            Lupa
+          </label>
+
+          <label class="toggle" id="soundToggle" title="Sonidos.">
+            <input id="soundOn" type="checkbox" checked />
+            Sonido
+          </label>
+        </div>
+      </div>
+
+      <canvas id="c"></canvas>
+
+      <div class="achievements">
+        <div class="achTitle">LOGROS</div>
+        <div class="achGrid" id="achGrid"></div>
+      </div>
+
+      <div class="ranking">
+        <div class="rankHeader">
+          <div class="rankTitle">RANKING (en esta tablet/PC)</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap">
+            <button id="rankRefreshBtn">Actualizar</button>
+            <button id="rankResetBtn" style="border-color: rgba(239,68,68,.5)">Reset ranking</button>
+          </div>
+        </div>
+        <div class="hint" style="margin-bottom:8px">
+          Puntos: <b>+1</b> por cuadro, <b>+10</b> por ganar, <b>+3</b> por empate. (CPU NO entra al ranking)
+        </div>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th><th>Nick</th>
+                <th class="num">Puntos</th>
+                <th class="num">Victorias</th>
+                <th class="num">Partidas</th>
+              </tr>
+            </thead>
+            <tbody id="rankBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="hint hintAfterBoard" style="margin-top:10px">
+        Toca cerca de un lado entre dos puntos para poner una línea. Si cierras un cuadrado, juegas otra vez.
+      </div>
+    </div>
+  </div>
+
+  
+  <!-- Panel de Sonidos (integrado desde sonidos.html) -->
+  <div class="soundPanelOverlay" id="soundPanelOverlay" aria-hidden="true">
+    <div class="soundPanel" role="dialog" aria-label="Panel de sonidos">
+      <div class="spHead">
+        <div>
+          <div class="spTitle">SONIDOS & EMOJIS</div>
+          <div class="hint" style="margin-top:6px">
+            Elige un jugador abajo y toca un emoji: se asigna y suena.
+          </div>
+        </div>
+        <div class="row" style="gap:8px">
+          <div class="spBadge">🎵 Música: <span id="musicNow2">—</span></div>
+          <button id="closeSoundPanelBtn" class="btnPrimary">Cerrar</button>
+        </div>
+      </div>
+
+      <div class="spGrid">
+        <div class="spCard">
+          <div class="spLabel">Jugador a configurar</div>
+          <div class="playerPick" id="spPlayerPick"></div>
+
+          <div class="spLabel" style="margin-top:12px">Vista rápida</div>
+          <div class="hint">Toca cualquier emoji para probar sonido sin asignar: mantén pulsado (o vuelve a tocar) el mismo jugador.</div>
+        </div>
+
+        <div class="spCard">
+          <div class="spLabel">Emojis (toca para asignar)</div>
+          <div class="emojiGrid" id="spEmojiGrid"></div>
+        </div>
+      </div>
+
+      <div class="spFooter">
+        <div class="spHint">Tip: los emojis se bloquean al iniciar la partida.</div>
+        <div class="row" style="gap:8px">
+          <button id="spTestTurnBtn">Sonido cambio turno</button>
+          <button id="spTestBeepBtn">Beep 5s</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="overlay" id="boardOverlay">
+    <div class="arcade" style="max-width:520px;">
+      <div class="arcadeHeader">
+        <div class="arcadeTitle">TABLERO</div>
+        <div class="arcadeBadge">Configurar</div>
+      </div>
+
+      <div class="ledCard" style="margin-top:10px">
+        <div class="label" style="color:rgba(255,255,255,.75); margin-bottom:8px">Tamaño (puntos)</div>
+        <div class="row">
+          <input id="boardCols" class="num" type="number" min="6" max="30" value="20" />
+          <span class="hint">×</span>
+          <input id="boardRows" class="num" type="number" min="6" max="30" value="20" />
+        </div>
+        <div class="hint" style="margin-top:8px">
+          Por defecto es 20×20. Para aplicar cambios durante una partida, se reinicia el tablero.
+        </div>
+      </div>
+
+      <div class="arcadeFooter">
+        <div class="arcadeMsg"> </div>
+        <div class="arcadeBtns">
+          <button id="boardApplyBtn" class="btnWin">Aplicar</button>
+          <button id="boardCancelBtn" class="btnLose">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<div class="overlay" id="overlay">
+    <div class="arcade">
+      <div class="arcadeHeader">
+        <div class="arcadeTitle">RESULTADO</div>
+        <div class="arcadeBadge" id="winnerBadge">—</div>
+      </div>
+
+      <div class="ledRow" id="resultsGrid"></div>
+
+      <div class="arcadeFooter">
+        <div class="arcadeMsg" id="arcadeReason">—</div>
+        <div class="arcadeBtns">
+          <button id="playAgainBtn" class="btnWin">Jugar otra</button>
+          <button id="closeOverlayBtn" class="btnLose">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- JS del juego -->
   <script src="./game.js"></script>
+  <!-- JS del menú -->
+  <script src="/assets/menu.js" defer></script>
 </body>
 </html>
